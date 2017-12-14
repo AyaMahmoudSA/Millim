@@ -52,7 +52,6 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:inputType="textCapWords"
-                android:maxLength="11"
                 android:textSize="17sp"
                 android:background="@drawable/bg_edittext_focused"/>
 
@@ -192,6 +191,8 @@
                 android:text="Save"
                 android:onClick="saveMerchantSettings"
                 />
+
+
         </RelativeLayout>
 
 

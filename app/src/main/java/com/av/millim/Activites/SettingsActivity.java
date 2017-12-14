@@ -3,8 +3,14 @@ package com.av.millim.Activites;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +27,12 @@ import com.av.millim.Model.MerchantLocation;
 import com.av.millim.ParseData.GetCallBack;
 import com.av.millim.ParseData.ParseUtils;
 import com.av.millim.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,6 +40,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
@@ -37,11 +50,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import static com.av.millim.Activites.SignUpActivity.getTypeOfAccount;
 import static com.av.millim.R.id.map;
 import static com.av.millim.R.id.thing_proto;
 import static com.av.millim.Services.MyFirebaseMessagingService.getContext;
 
-public class SettingsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SettingsActivity extends AppCompatActivity implements OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private Toolbar toolbarSettings;
     private RelativeLayout userSettings,merchantSettings;
@@ -55,7 +70,18 @@ public class SettingsActivity extends AppCompatActivity implements OnMapReadyCal
     private GoogleMap mMap;
 
     private MerchantLocation setMerchantLocation;
+    private String getTypeOfAccount;
 
+    private final int REQ_PERMISSION = 999;
+    private GoogleApiClient mGoogleApiClient;
+    private Location lastLocation;
+    private LocationRequest locationRequest;
+    private final int UPDATE_INTERVAL =  1 * 60 * 1000; // 3 minutes
+    private final int FASTEST_INTERVAL = 30 * 1000;  // 30 secs
+    private Marker locationMarker;  // to current location
+
+    String getLatitude;
+    String getLongitude;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +90,8 @@ public class SettingsActivity extends AppCompatActivity implements OnMapReadyCal
         toolbarSettings = (Toolbar) findViewById(R.id.toolbar_settings);
         toolbarSettings.setNavigationIcon(getResources().getDrawable(R.drawable.ic_left_arrow_blue));
         setSupportActionBar(toolbarSettings);
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // to back
         getSupportActionBar().setDisplayShowTitleEnabled(false); // remove label name (title)
 
@@ -83,7 +111,7 @@ public class SettingsActivity extends AppCompatActivity implements OnMapReadyCal
         merchantName       = (EditText) findViewById(R.id.et_merchant_name);
         merchantPassword   = (EditText) findViewById(R.id.et_merchant_password);
 
-        String getTypeOfAccount = new StoreData(this).loadTypeOfContactTest();
+        getTypeOfAccount = new StoreData(this).loadTypeOfContactTest();
         if(getTypeOfAccount.equals("1")){
             merchantSettings.setVisibility(View.VISIBLE);
             userSettings.setVisibility(View.GONE);
@@ -105,6 +133,24 @@ public class SettingsActivity extends AppCompatActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
+
+               getLatitude  = new StoreData(this).loadLatitude();
+               getLongitude = new StoreData(this).loadLongitude();
+
+                 // merchant does not put location
+                 // get current
+                if(getTypeOfAccount.equals("1")&getLatitude.matches("")&&getLongitude.matches("")){
+                    // Create an instance of GoogleAPIClient.
+                    if (mGoogleApiClient == null) {
+                        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                                .addConnectionCallbacks(this)
+                                .addOnConnectionFailedListener(this)
+                                .addApi(LocationServices.API)
+                                .build();
+                    }
+                }
+
+
 
     }
 
@@ -275,41 +321,37 @@ public class SettingsActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
          mMap = googleMap;
-        LatLng getLocation = new LatLng(Double.parseDouble(new StoreData(this).loadLatitude()),Double.parseDouble(new StoreData(this).loadLongitude() ));
-        mMap.addMarker(new MarkerOptions().position(getLocation).title(new StoreData(this).loadStoreName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_map)));
-        final CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(getLocation)      // Sets the center of the map to Mountain View
-                .zoom(25)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();
 
-        setMerchantLocation(getLocation);
+        if(getTypeOfAccount.equals("1")){
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+              if(!getLatitude.matches("")&&!getLatitude.matches("")){
+                  LatLng getLocation = new LatLng(Double.parseDouble(getLatitude),Double.parseDouble(getLongitude));
+                  mMap.addMarker(new MarkerOptions().position(getLocation).title(new StoreData(this).loadStoreName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_map)));
+                  float zoom = 20f;
+                  CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(getLocation, zoom);
+                  mMap.animateCamera(cameraUpdate);
 
-            @Override
-            public void onMapClick(LatLng point) {
-                // TODO Auto-generated method stub
-                //  lstLatLngs.add(point);
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(point).title(new StoreData(SettingsActivity.this).loadStoreName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_map)));
+                  setMerchantLocation(getLocation);
 
-                setMerchantLocation(point);
+                  mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+                      @Override
+                      public void onMapClick(LatLng point) {
+                          // TODO Auto-generated method stub
+                          //  lstLatLngs.add(point);
+                          mMap.clear();
+                          mMap.addMarker(new MarkerOptions().position(point).title(new StoreData(SettingsActivity.this).loadStoreName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_map)));
+
+                          setMerchantLocation(point);
+
+                      }
+                  });
+
+              }
 
 
+        }
 
-
-
-
-
-
-
-            }
-        });
-
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
 
@@ -346,4 +388,138 @@ public class SettingsActivity extends AppCompatActivity implements OnMapReadyCal
 
         return  setMerchantLocation;
     }
+
+    @Override
+    protected void onStart() {
+
+        if(getTypeOfAccount.equals("1")&getLatitude.matches("")&&getLongitude.matches(""))
+        mGoogleApiClient.connect();
+
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        if(getTypeOfAccount.equals("1")&getLatitude.matches("")&&getLongitude.matches(""))
+            mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        getLastKnownLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        lastLocation = location;
+
+        writeActualLocation(location);
+    }
+
+
+    // Get last known location
+    private void getLastKnownLocation() {
+        //   Log.d(TAG, "getLastKnownLocation()");
+        if ( checkPermission() ) {
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if ( lastLocation != null ) {
+            /*  //  Log.i(TAG, "LasKnown location. " +
+                        "Long: " + lastLocation.getLongitude() +
+                        " | Lat: " + lastLocation.getLatitude());*/
+                startLocationUpdates();
+            } else {
+                //   Log.w(TAG, "No location retrieved yet");
+                startLocationUpdates();
+            }
+        }
+        else askPermission();
+    }
+
+
+    // Check for permission to access Location
+    private boolean checkPermission() {
+        //   Log.d(TAG, "checkPermission()");
+        // Ask for permission if it wasn't granted yet
+        return (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED );
+    }
+
+    // Asks for permission
+    private void askPermission() {
+        //  Log.d(TAG, "askPermission()");
+        ActivityCompat.requestPermissions(
+                this,
+                new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION },
+                REQ_PERMISSION
+        );
+    }
+
+    // Start location Updates
+    private void startLocationUpdates(){
+        //  Log.i(TAG, "startLocationUpdates()");
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(UPDATE_INTERVAL)
+                .setFastestInterval(FASTEST_INTERVAL);
+
+        if ( checkPermission() )
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
+    }
+
+    private void markerLocation(LatLng latLng) {
+        //  Log.i(TAG, "markerLocation("+latLng+")");
+        String title ="Your current location";
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(latLng)
+                .title(title)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_map));
+        if ( mMap!=null ) {
+            // Remove the anterior marker
+            if ( locationMarker != null )
+                locationMarker.remove();
+            locationMarker = mMap.addMarker(markerOptions);
+            float zoom = 14f;
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+            mMap.animateCamera(cameraUpdate);
+
+            setMerchantLocation(latLng);
+
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+                @Override
+                public void onMapClick(LatLng point) {
+                    // TODO Auto-generated method stub
+                    //  lstLatLngs.add(point);
+                    mMap.clear();
+                    mMap.addMarker(new MarkerOptions().position(point).title(new StoreData(SettingsActivity.this).loadStoreName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_map)));
+
+                    setMerchantLocation(point);
+
+                }
+            });
+
+
+
+
+        }
+    }
+
+
+    // Write location coordinates on UI
+    private void writeActualLocation(Location location) {
+        markerLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+
+    }
+
 }
