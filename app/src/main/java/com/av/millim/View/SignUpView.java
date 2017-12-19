@@ -1,11 +1,8 @@
 package com.av.millim.View;
 
 import android.content.Intent;
-import android.location.Location;
 
 import com.av.millim.Model.MerchantLocation;
-
-import java.util.ArrayList;
 
 /**
  * Created by Maiada on 10/30/2017.
@@ -62,6 +59,8 @@ public interface SignUpView {
 
     void showVerificationDialogCode(String getVerificationCodeGenerator);
 
+    void getPermission();
+    void getLocation();
 
 
 

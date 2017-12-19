@@ -3,17 +3,12 @@ package com.av.millim.Prestener;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
-import com.av.millim.Activites.SignUpActivity;
-import com.av.millim.Data.ActivityUtil;
 import com.av.millim.Data.CONSTANTS;
 import com.av.millim.Data.StoreData;
 import com.av.millim.Model.MerchantLocation;
@@ -25,8 +20,6 @@ import com.av.millim.View.SignUpView;
 import org.json.JSONObject;
 
 import java.util.Random;
-
-import static com.av.millim.Activites.SignUpActivity.getTypeOfAccount;
 
 /**
  * Created by Maiada on 10/30/2017.
@@ -119,7 +112,7 @@ public class SignUpPresenter {
 
 
                             }else{
-                                MerchantLocation getMerchantLocationN = new MerchantLocation();
+                                /*MerchantLocation getMerchantLocationN = new MerchantLocation();
                                 getMerchantLocationN.setLatitude("");
                                 getMerchantLocationN.setLongitude("");
                                 getMerchantLocationN.setCountry("");
@@ -135,11 +128,11 @@ public class SignUpPresenter {
 
                                         //   Toast.makeText(getContext,"Uploading your file...",Toast.LENGTH_SHORT).show();
 
-                       /* new StoreData(getContext).saveTypeOfContactSign("0");
+                       *//* new StoreData(getContext).saveTypeOfContactSign("0");
                         new StoreData(getContext).saveFilePath1("");
                         new StoreData(getContext).saveFilePath2("");
                         new StoreData(getContext).saveUploadImage("");
-                        new StoreData(getContext).saveUploadFile("");*/
+                        new StoreData(getContext).saveUploadFile("");*//*
 
                                         signUpView.startLoginActivity();
                                         hideProgressDialog();
@@ -159,7 +152,7 @@ public class SignUpPresenter {
                                     public void onNetworkFailure() {
 
                                     }
-                                },signUpView.getStoreName(),signUpView.getFirstNameMerchant()+" "+signUpView.getLastNameMerchant(),Integer.parseInt(signUpView.getMobileOrAccountNumberMerchant()),Integer.parseInt(signUpView.getConfirmPinCodeMerchant()),getMerchantLocationN,"",1,CONSTANTS.deviceToken);
+                                },signUpView.getStoreName(),signUpView.getFirstNameMerchant()+" "+signUpView.getLastNameMerchant(),Integer.parseInt(signUpView.getMobileOrAccountNumberMerchant()),Integer.parseInt(signUpView.getConfirmPinCodeMerchant()),getMerchantLocationN,"",1,CONSTANTS.deviceToken);*/
                             }
 
 
@@ -345,8 +338,10 @@ public class SignUpPresenter {
         else if(!signUpView.getPinCodeMerchant().matches(signUpView.getConfirmPinCodeMerchant())) {
             signUpView.showErrorMismatchConfirmPinCodeMerchant(getContext.getResources().getString(R.string.not_match));
             return false;
+        }else if(new StoreData(getContext).loadLatitude().matches("")&&new StoreData(getContext).loadLatitude().matches("")){
+            signUpView.getPermission();
+            return false;
         }
-
         return true;
     }
 
