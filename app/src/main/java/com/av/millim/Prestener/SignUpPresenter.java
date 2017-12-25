@@ -19,6 +19,7 @@ import com.av.millim.View.SignUpView;
 
 import org.json.JSONObject;
 
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -193,11 +194,13 @@ public class SignUpPresenter {
 
                             progressDialog = new ProgressDialog(getContext);
                             progressDialog.setMessage(getContext.getResources().getString(R.string.loading_data));
+                            progressDialog.setCanceledOnTouchOutside(false);
                             showProgressDialog();
 
                             // Check first phoneNumber
                             // if hasPinCod  ---> User Register
                             // if status    ----> not register and start it verification code
+
                             ParseUtils.ForgotPinUser(new GetCallBack.ForgotPinUser() {
                                 @Override
                                 public void onSuccess(String newPinCode, String success) {
@@ -208,11 +211,17 @@ public class SignUpPresenter {
                                 @Override
                                 public void onFailure(String throwable) {
                                     verificationCodeGenerator = String.format("%04d", new Random().nextInt(10000));
+
+                                    if(Locale.getDefault().getLanguage().matches("ar")){
+                                       verificationCodeGenerator= englishNumber(verificationCodeGenerator);
+                                    }
+
                                     Toast.makeText(getContext,"Sending SMS...",Toast.LENGTH_LONG).show();
-                                 /*   signUpView.showVerificationDialogCode(verificationCodeGenerator);
+
+                                  /*  signUpView.showVerificationDialogCode(verificationCodeGenerator);
                                     hideProgressDialog();*/
 
-                                    ParseUtils.SendSmsToUserOrMerchantForgotPinCode(new GetCallBack.SendSMS() {
+                                   ParseUtils.SendSmsToUserOrMerchantForgotPinCode(new GetCallBack.SendSMS() {
                                         @Override
                                         public void onSuccess(String getRespsone) {
                                             signUpView.showVerificationDialogCode(verificationCodeGenerator);
@@ -393,4 +402,30 @@ public class SignUpPresenter {
             }
         },signUpView.getFirstName()+" "+signUpView.getLastName(), Integer.parseInt(signUpView.getMobileOrAccountNumber()), Integer.parseInt(signUpView.getPinCode()),Integer.parseInt("1"),CONSTANTS.deviceToken);
     }
+
+
+    public  String englishNumber(String getArabicNumber){
+        String [] arabicNumbers  =  {"١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩", "٠"};
+        String [] englishNumbers = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+
+        StringBuilder getNumberAsEnglish= new StringBuilder();
+
+        for(int i=0;i<getArabicNumber.length();i++){
+            String getNumber = String.valueOf(getArabicNumber.charAt(i));
+            for(int j=0;j<arabicNumbers.length;j++){
+                if(getNumber.matches(arabicNumbers[j])){
+                    getNumberAsEnglish.append(englishNumbers[j]);
+                    break;
+                }else {
+                    continue;
+                }
+            }
+
+
+
+        }
+        return  getNumberAsEnglish.toString();
+
+    }
+
 }

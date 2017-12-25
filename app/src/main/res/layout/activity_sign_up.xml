@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/backgound_color"
+    android:scrollbars="vertical"
+    tools:context="com.av.millim.Activites.SignUpActivity">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_millim_logo"
+            android:id="@+id/img_logo" />
+
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/spinner"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="30dp"
+            android:layout_below="@id/img_logo"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:textColorHint="@color/text_color_hint"
+            android:textColor="@color/text_color_hint"
+            />
+
+
+        <RelativeLayout
+            android:layout_below="@id/spinner"
+            android:id="@+id/both"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/signup_for_users"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:visibility="visible">
+
+                <EditText
+                    android:id="@+id/et_first_name"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_marginTop="15dp"
+                    android:hint="@string/first_name"
+                    android:inputType="textCapWords"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_last_name"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_first_name"
+                    android:hint="@string/last_name"
+                    android:inputType="textCapWords"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_mobile_or_account_no"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_last_name"
+                    android:hint="@string/mobile_no"
+                    android:inputType="number"
+                    android:maxLength="11"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_pin_code"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_mobile_or_account_no"
+                    android:hint="@string/pin"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_confirm_pin_code"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_pin_code"
+                    android:hint="@string/confirm_pin"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="100dp"
+                    android:background="@drawable/background_button"
+                    android:gravity="center"
+                    android:onClick="Register"
+                    android:text="Register"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bg_white" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/signup_for_merchant"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/et_store_name"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_marginTop="15dp"
+                    android:hint="@string/store_name"
+                    android:inputType="textCapWords|textPersonName"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_merchant_first_name"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_store_name"
+                    android:hint="@string/first_name"
+                    android:inputType="textCapWords|textPersonName"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_merchant_last_name"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_merchant_first_name"
+                    android:hint="@string/last_name"
+                    android:inputType="textCapWords|textPersonName"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_merchant_mobile_no"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_merchant_last_name"
+                    android:hint="@string/mobile_no"
+                    android:inputType="number"
+                    android:maxLength="11"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_merchant_pin"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_merchant_mobile_no"
+                    android:hint="@string/pin"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_confirm_merchant_pin"
+                    style="@style/EditTextSignUpScreenStyle"
+                    android:layout_below="@+id/et_merchant_pin"
+                    android:hint="@string/confirm_pin"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:textSize="15sp" />
+
+
+                <TextView
+                    android:id="@+id/txt_attach_word"
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/et_confirm_merchant_pin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:textColor="@color/bg_white"
+                    android:layout_marginLeft="30dp"
+                    android:textSize="15sp"
+                    android:text="Attach document: "/>
+
+                <ImageView
+                    android:id="@+id/btn_attach_document"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="51dp"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/attach_document"
+                    android:src="@drawable/ic_clip"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bg_white"
+                    android:layout_below="@+id/et_confirm_merchant_pin"
+                    android:layout_toRightOf="@+id/txt_attach_word"
+                    android:layout_toEndOf="@+id/txt_attach_word"
+                    />
+
+                <ListView
+                    android:layout_marginTop="12dp"
+                    android:visibility="visible"
+                    android:id="@+id/list_image_document"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    tools:listitem="@layout/row_list_image"
+                    android:layout_below="@+id/txt_attach_word"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    />
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_below="@+id/list_image_document"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/background_button"
+                    android:gravity="center"
+                    android:onClick="Register"
+                    android:text="Register"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bg_white" />
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+        <!--
+            <RelativeLayout
+                android:id="@+id/for_merchant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/both"
+                android:layout_marginTop="15dp">
+
+
+
+
+           &lt;!&ndash;     <TextView
+                    android:id="@+id/add_anther"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_toRightOf="@+id/btn_attch_doucment1"
+                    android:text="@string/add_another"
+                    android:textColor="@color/bg_white"
+                    android:textSize="18sp"
+                    android:visibility="gone" />&ndash;&gt;
+
+
+            </RelativeLayout>-->
+
+
+
+    </RelativeLayout>
+</ScrollView>
